@@ -7,8 +7,18 @@
 
 import Foundation
 
-struct ItemModel : Identifiable {
-    let id: String = UUID().uuidString
+struct ItemModel : Identifiable, Codable {
+    let id: String
     let title :String
     let isCompeleted : Bool
+    
+    init(id: String = UUID().uuidString, title: String, isCompeleted: Bool) {
+        self.id = id
+        self.title = title
+        self.isCompeleted = isCompeleted
+    }
+    
+    func updateCompletion() -> ItemModel {
+        return ItemModel(id: id, title: title, isCompeleted: !isCompeleted)
+    }
 }

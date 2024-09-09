@@ -20,7 +20,7 @@ struct AddView: View {
                 TextField("Type something here ....", text: $textFieldText)
                     .padding(.horizontal)
                     .frame(height:55)
-                    .background(Color(#colorLiteral(red: 0.921431005, green: 0.9214526415, blue: 0.9214410186, alpha: 1)))
+                    .background(Color(UIColor.secondarySystemBackground))
                    .cornerRadius(15.0)
                 
                 Button(action: saveButtonPressed, label: {
@@ -37,6 +37,7 @@ struct AddView: View {
             .padding(13)
         }
         .navigationTitle("Add an Item 🖊️ ")
+        .alert(isPresented: $showAlert, content: getAlert)
     }
     func saveButtonPressed (){
         if textIsAppropriate() {
@@ -48,9 +49,14 @@ struct AddView: View {
     
     func textIsAppropriate () -> Bool{
         if textFieldText.count < 3 {
+            alertTitle = "Your new todo item must be at least 3 character long!! 😨😰😱 "
+            showAlert.toggle()
             return false
         }
         return true
+    }
+    func getAlert () -> Alert {
+        return Alert(title: Text(alertTitle))
     }
 }
 

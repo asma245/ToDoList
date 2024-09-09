@@ -8,29 +8,42 @@
 import Foundation
 
 class ListViewModel: ObservableObject {
-    @Published var item: [ItemModel] = []
+    @Published var items: [ItemModel] = []{
+        didSet{
+            saveItem()
+        }
+    }
+    let itemsKey: String = "items_list"
     
     init() {
         getItems()
     }
     func getItems(){
-       let newItem = [
-        ItemModel(title: "This is first item", isCompeleted: false),
-        ItemModel(title: "This is second item", isCompeleted: true),
-        ItemModel(title: "Third", isCompeleted: false),
-         ]
-        item.append(contentsOf: newItem)
+        
+        guard let data = UserDefaults.standard.data(forKey: itemsKey) else { return }
+        guard let savedItems = try? JSONDecoder() .decode([ItemModel].self, from: data) else { return }
+        self.items = savedItems
     }
-    func deleteItem (indexSet:IndexSet){
-        item.remove(atOffsets: indexSet)
+    func deleteItem (indexSet: IndexSet){
+        items.remove(atOffsets: indexSet)
     }
     func moveItem (from: IndexSet , to: Int ){
-        item.move(fromOffsets: from, toOffset: to)
+        items.move(fromOffsets: from, toOffset: to)
         
     }
-    func saveItem (title:String){
+    func saveItem (title: String){
         let newItem = ItemModel(title: title, isCompeleted: false)
-        item.append(newItem)
+        items.append(newItem)
+    }
+    func updateItem (item: ItemModel){
+        if let index = items.firstIndex(where: { $0.id == item.id}){
+            items[index] = item.updateCompletion()
+        }
+    }
+    func saveItem() {
+        if let encodedDate = try? JSONEncoder().encode(items){
+            UserDefaults.standard.set(encodedDate, forKey: itemsKey)
+        }
     }
     
 }
